@@ -39,7 +39,7 @@ public class SubjectServiceImpl implements SubjectService{
 
             subject.setName(newSubject.getName());
             subject.setDescription(newSubject.getDescription());
-            subject.setTeacherName(newSubject.getTeacherName());
+            subject.setTeacher(newSubject.getTeacher());
 
             return subjectRepository.save(subject);
         }else{

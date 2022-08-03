@@ -1,7 +1,7 @@
 package com.jdnt.perficient.training.controller;
 
 import com.jdnt.perficient.training.entity.User;
-import com.jdnt.perficient.training.service.UserServiceImpl;
+import com.jdnt.perficient.training.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +14,7 @@ import java.util.List;
 public class UserController {
 
     @Autowired
-    private UserServiceImpl userService;
+    private UserService userService;
 
     @GetMapping
     public List<User> getUsers(){

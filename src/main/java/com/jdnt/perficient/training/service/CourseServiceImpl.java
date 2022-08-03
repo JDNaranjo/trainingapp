@@ -1,5 +1,6 @@
 package com.jdnt.perficient.training.service;
 
+import com.jdnt.perficient.training.entity.Student;
 import com.jdnt.perficient.training.exception.UserNotCreatedException;
 import com.jdnt.perficient.training.exception.UserNotDeletedException;
 import com.jdnt.perficient.training.exception.UserNotFoundException;
@@ -7,7 +8,7 @@ import com.jdnt.perficient.training.exception.UserNotUpdatedException;
 import com.jdnt.perficient.training.entity.Course;
 import com.jdnt.perficient.training.entity.User;
 import com.jdnt.perficient.training.repository.CourseRepository;
-import com.jdnt.perficient.training.repository.UserRepository;
+import com.jdnt.perficient.training.repository.StudentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +21,7 @@ public class CourseServiceImpl implements CourseService{
     CourseRepository courseRepository;
 
     @Autowired
-    UserRepository userRepository;
+    StudentRepository studentRepository;
 
     public List<Course> getCourses(){
         return courseRepository.findAll();
@@ -59,15 +60,15 @@ public class CourseServiceImpl implements CourseService{
     }
 
     public Course enrollUser(Long userId, Long courseId){
-        if(courseRepository.existsById(courseId) && userRepository.existsById(userId)){
-            User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
+        if(courseRepository.existsById(courseId) && studentRepository.existsById(userId)){
+            Student student = studentRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
             Course course = courseRepository.findById(courseId)
                     .orElseThrow(() -> new UserNotFoundException(courseId));
 
-            course.getUsersEnrolled().add(user);
-            user.setCourse(course);
+            course.getStudentsEnrolled().add(student);
+            student.setCourse(course);
 
-            userRepository.save(user);
+            studentRepository.save(student);
             courseRepository.save(course);
 
             return courseRepository.findById(courseId).orElseThrow(() -> new UserNotFoundException(courseId));
