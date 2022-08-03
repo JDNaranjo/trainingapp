@@ -1,0 +1,26 @@
+version: '3.9'
+
+services:
+  app:
+    image: 'trainingapp:latest'
+    build:
+      context: .
+    container_name: trainingapp
+    depends_on:
+      - db
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/
+      - SPRING_DATASOURCE_USERNAME=jdnaranjo
+      - SPRING_DATASOURCE_PASSWORD=JuanNaranjo1206
+      - SPRING_JPA_SHOW_SQL=true
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+    ports:
+      - 8080:8080
+
+  db:
+    image: 'postgres:alpine3.16'
+    container_name: db
+    environment:
+      POSTGRES_USER: jdnaranjo
+      POSTGRES_PASSWORD: JuanNaranjo1206
+      POSTGRES_DATABASE: trainingapp
