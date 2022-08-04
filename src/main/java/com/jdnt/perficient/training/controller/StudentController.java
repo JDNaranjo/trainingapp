@@ -1,7 +1,6 @@
 package com.jdnt.perficient.training.controller;
 
 import com.jdnt.perficient.training.entity.Student;
-import com.jdnt.perficient.training.entity.User;
 import com.jdnt.perficient.training.service.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

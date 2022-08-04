@@ -9,7 +9,7 @@ public interface TeacherService {
 
     public List<Subject> getSubjects(Long id);
 
-    public String deleteSubject(Long id);
+    public String deleteSubject(Long teacherId, Long subjectId);
 
     public List<Teacher> getTeachers();
 

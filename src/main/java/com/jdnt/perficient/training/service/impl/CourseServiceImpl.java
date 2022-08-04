@@ -1,4 +1,4 @@
-package com.jdnt.perficient.training.service;
+package com.jdnt.perficient.training.service.impl;
 
 import com.jdnt.perficient.training.entity.Student;
 import com.jdnt.perficient.training.exception.UserNotCreatedException;
@@ -9,13 +9,14 @@ import com.jdnt.perficient.training.entity.Course;
 import com.jdnt.perficient.training.entity.User;
 import com.jdnt.perficient.training.repository.CourseRepository;
 import com.jdnt.perficient.training.repository.StudentRepository;
+import com.jdnt.perficient.training.service.CourseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-public class CourseServiceImpl implements CourseService{
+public class CourseServiceImpl implements CourseService {
 
     @Autowired
     CourseRepository courseRepository;

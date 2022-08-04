@@ -1,4 +1,4 @@
-package com.jdnt.perficient.training.service;
+package com.jdnt.perficient.training.service.impl;
 
 import com.jdnt.perficient.training.exception.UserNotCreatedException;
 import com.jdnt.perficient.training.exception.UserNotDeletedException;
@@ -6,13 +6,14 @@ import com.jdnt.perficient.training.exception.UserNotFoundException;
 import com.jdnt.perficient.training.exception.UserNotUpdatedException;
 import com.jdnt.perficient.training.entity.Subject;
 import com.jdnt.perficient.training.repository.SubjectRepository;
+import com.jdnt.perficient.training.service.SubjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-public class SubjectServiceImpl implements SubjectService{
+public class SubjectServiceImpl implements SubjectService {
 
     @Autowired
     SubjectRepository subjectRepository;

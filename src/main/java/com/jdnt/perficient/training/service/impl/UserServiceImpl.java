@@ -1,4 +1,4 @@
-package com.jdnt.perficient.training.service;
+package com.jdnt.perficient.training.service.impl;
 
 import com.jdnt.perficient.training.exception.UserNotCreatedException;
 import com.jdnt.perficient.training.exception.UserNotDeletedException;
@@ -6,13 +6,14 @@ import com.jdnt.perficient.training.exception.UserNotFoundException;
 import com.jdnt.perficient.training.exception.UserNotUpdatedException;
 import com.jdnt.perficient.training.entity.User;
 import com.jdnt.perficient.training.repository.UserRepository;
+import com.jdnt.perficient.training.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-public class UserServiceImpl implements UserService{
+public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserRepository userRepository;
@@ -44,9 +45,8 @@ public class UserServiceImpl implements UserService{
             user.setUsername(newUser.getUsername());
 
             return userRepository.save(user);
-        }else{
-            throw new UserNotUpdatedException(id);
         }
+        throw new UserNotUpdatedException(id);
     }
 
     public String deleteUser(Long id) {

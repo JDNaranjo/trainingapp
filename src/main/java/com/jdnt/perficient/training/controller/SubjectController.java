@@ -1,7 +1,7 @@
 package com.jdnt.perficient.training.controller;
 
 import com.jdnt.perficient.training.entity.Subject;
-import com.jdnt.perficient.training.service.SubjectServiceImpl;
+import com.jdnt.perficient.training.service.impl.SubjectServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
