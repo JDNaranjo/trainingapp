@@ -1,5 +1,6 @@
 package com.jdnt.perficient.training.service.impl;
 
+import com.jdnt.perficient.training.DTO.SubjectDTO;
 import com.jdnt.perficient.training.exception.UserNotCreatedException;
 import com.jdnt.perficient.training.exception.UserNotDeletedException;
 import com.jdnt.perficient.training.exception.UserNotFoundException;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class SubjectServiceImpl implements SubjectService {
@@ -18,23 +20,40 @@ public class SubjectServiceImpl implements SubjectService {
     @Autowired
     SubjectRepository subjectRepository;
 
-    public List<Subject> getSubjects(){
-        return subjectRepository.findAll();
+    public SubjectDTO convertSubjectToDTO(Subject subject) {
+
+        SubjectDTO subjectDTO = new SubjectDTO();
+        subjectDTO.setName(subject.getName());
+        subjectDTO.setDescription(subject.getDescription());
+        subjectDTO.setCourseName(subject.getCourse().getName());
+        subjectDTO.setTeacherName(subject.getTeacher().getName());
+
+        return subjectDTO;
     }
 
-    public Subject getSubjectById(Long id){
-        return subjectRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
+    public List<SubjectDTO> getSubjects(){
+        return subjectRepository.findAll().stream()
+                .map(this::convertSubjectToDTO)
+                .collect(Collectors.toList());
     }
 
-    public Subject createSubject(Subject newSubject){
+    public SubjectDTO getSubjectById(Long id){
+        return convertSubjectToDTO(
+                subjectRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id))
+        );
+    }
+
+    public SubjectDTO createSubject(Subject newSubject){
         if (newSubject != null){
-            return subjectRepository.save(newSubject);
+            return convertSubjectToDTO(
+                    subjectRepository.save(newSubject)
+            );
         }else {
             throw new UserNotCreatedException();
         }
     }
 
-    public Subject updateSubject(Long id, Subject newSubject) {
+    public SubjectDTO updateSubject(Long id, Subject newSubject) {
         if (subjectRepository.existsById(id) && newSubject != null){
             Subject subject = subjectRepository.findById(id).get();
 
@@ -42,7 +61,9 @@ public class SubjectServiceImpl implements SubjectService {
             subject.setDescription(newSubject.getDescription());
             subject.setTeacher(newSubject.getTeacher());
 
-            return subjectRepository.save(subject);
+            return convertSubjectToDTO(
+                    subjectRepository.save(subject)
+                );
         }else{
             throw new UserNotUpdatedException(id);
         }

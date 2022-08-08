@@ -1,5 +1,6 @@
 package com.jdnt.perficient.training.controller;
 
+import com.jdnt.perficient.training.DTO.SubjectDTO;
 import com.jdnt.perficient.training.entity.Subject;
 import com.jdnt.perficient.training.service.impl.SubjectServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,23 +18,23 @@ public class SubjectController {
     private SubjectServiceImpl subjectService;
 
     @GetMapping
-    public List<Subject> getSubject(){
+    public List<SubjectDTO> getSubject(){
         return subjectService.getSubjects();
     }
 
     @GetMapping(value = "/{id}")
-    public ResponseEntity<Subject> getCourseById(@PathVariable Long id){
-        return new ResponseEntity<Subject>(subjectService.getSubjectById(id), HttpStatus.OK);
+    public ResponseEntity<SubjectDTO> getCourseById(@PathVariable Long id){
+        return new ResponseEntity<SubjectDTO>(subjectService.getSubjectById(id), HttpStatus.OK);
     }
 
     @PostMapping(path = "/")
-    public ResponseEntity<Subject> createCourse(@RequestBody Subject newSubject){
-        return new ResponseEntity<Subject>(subjectService.createSubject(newSubject), HttpStatus.OK);
+    public ResponseEntity<SubjectDTO> createCourse(@RequestBody Subject newSubject){
+        return new ResponseEntity<SubjectDTO>(subjectService.createSubject(newSubject), HttpStatus.OK);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Subject> updateSubject(@PathVariable Long id, @RequestBody Subject newSubject){
-        return new ResponseEntity<Subject>(subjectService.updateSubject(id, newSubject), HttpStatus.OK);
+    public ResponseEntity<SubjectDTO> updateSubject(@PathVariable Long id, @RequestBody Subject newSubject){
+        return new ResponseEntity<SubjectDTO>(subjectService.updateSubject(id, newSubject), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")

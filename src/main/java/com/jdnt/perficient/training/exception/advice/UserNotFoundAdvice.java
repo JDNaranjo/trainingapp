@@ -1,5 +1,6 @@
-package com.jdnt.perficient.training.exception;
+package com.jdnt.perficient.training.exception.advice;
 
+import com.jdnt.perficient.training.exception.UserNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;

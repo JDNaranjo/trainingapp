@@ -1,8 +1,7 @@
 package com.jdnt.perficient.training.controller;
 
-import com.jdnt.perficient.training.entity.Student;
+import com.jdnt.perficient.training.DTO.TeacherDTO;
 import com.jdnt.perficient.training.entity.Teacher;
-import com.jdnt.perficient.training.service.StudentService;
 import com.jdnt.perficient.training.service.TeacherService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,23 +18,23 @@ public class TeacherController {
     private TeacherService teacherService;
 
     @GetMapping
-    public List<Teacher> getTeachers(){
+    public List<TeacherDTO> getTeachers(){
         return teacherService.getTeachers();
     }
 
     @GetMapping(value = "/{id}")
-    public ResponseEntity<Teacher> getTeacherById(@PathVariable Long id){
-        return new ResponseEntity<Teacher>(teacherService.getTeacherById(id), HttpStatus.OK);
+    public ResponseEntity<TeacherDTO> getTeacherById(@PathVariable Long id){
+        return new ResponseEntity<TeacherDTO>(teacherService.getTeacherById(id), HttpStatus.OK);
     }
 
     @PostMapping(path = "/")
-    public ResponseEntity<Teacher> createTeacher(@RequestBody Teacher newTeacher){
-        return new ResponseEntity<Teacher>(teacherService.createTeacher(newTeacher), HttpStatus.OK);
+    public ResponseEntity<TeacherDTO> createTeacher(@RequestBody Teacher newTeacher){
+        return new ResponseEntity<TeacherDTO>(teacherService.createTeacher(newTeacher), HttpStatus.OK);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Teacher> updateTeacher(@PathVariable Long id, @RequestBody Teacher newTeacher){
-        return new ResponseEntity<Teacher>(teacherService.updateTeacher(id, newTeacher), HttpStatus.OK);
+    public ResponseEntity<TeacherDTO> updateTeacher(@PathVariable Long id, @RequestBody Teacher newTeacher){
+        return new ResponseEntity<TeacherDTO>(teacherService.updateTeacher(id, newTeacher), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")

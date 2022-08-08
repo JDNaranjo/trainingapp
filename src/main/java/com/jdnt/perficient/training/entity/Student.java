@@ -20,9 +20,8 @@ public class Student extends User {
     private Course course;
 
     public Student(String name, String lastName, @Email @NotBlank String email, String username,
-                   @NotBlank String password, Course course) {
+                   @NotBlank String password) {
         super(name, lastName, email, username, password);
-        this.course = course;
     }
 
 }

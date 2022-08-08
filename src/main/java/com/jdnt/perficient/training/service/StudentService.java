@@ -1,23 +1,26 @@
 package com.jdnt.perficient.training.service;
 
-import com.jdnt.perficient.training.entity.Course;
+import com.jdnt.perficient.training.DTO.CourseDTO;
+import com.jdnt.perficient.training.DTO.StudentDTO;
 import com.jdnt.perficient.training.entity.Student;
 
 import java.util.List;
 
 public interface StudentService {
 
-    public Course getCourse(Long id);
+    public CourseDTO getCourse(Long id);
 
     public String deleteCourse(Long id);
 
-    public List<Student> getStudents();
+    public CourseDTO updateCourse(Long studentId, Long courseId);
 
-    public Student getStudentById(Long id);
+    public List<StudentDTO> getStudents();
 
-    public Student createStudent(Student newUser);
+    public StudentDTO getStudentById(Long id);
 
-    public Student updateStudent(Long id, Student newUser);
+    public StudentDTO createStudent(Student newUser);
+
+    public StudentDTO updateStudent(Long id, Student newUser);
 
     public String deleteStudent(Long id);
 }

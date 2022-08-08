@@ -1,5 +1,6 @@
-package com.jdnt.perficient.training.exception;
+package com.jdnt.perficient.training.exception.advice;
 
+import com.jdnt.perficient.training.exception.UserNotUpdatedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -7,12 +8,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ControllerAdvice
-public class UserNotCreatedAdvice {
+public class UserNotUpdatedAdvice {
 
     @ResponseBody
-    @ExceptionHandler(UserNotCreatedException.class)
+    @ExceptionHandler(UserNotUpdatedException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    String userNotCreatedHandler(UserNotCreatedException e) {
+    String userNotUpdatedHandler(UserNotUpdatedException e) {
         return e.getMessage();
     }
 

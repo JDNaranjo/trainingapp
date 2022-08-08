@@ -1,6 +1,8 @@
 package com.jdnt.perficient.training.service.impl;
 
+import com.jdnt.perficient.training.DTO.CourseDTO;
 import com.jdnt.perficient.training.entity.Student;
+import com.jdnt.perficient.training.entity.Subject;
 import com.jdnt.perficient.training.exception.UserNotCreatedException;
 import com.jdnt.perficient.training.exception.UserNotDeletedException;
 import com.jdnt.perficient.training.exception.UserNotFoundException;
@@ -14,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class CourseServiceImpl implements CourseService {
@@ -24,45 +27,70 @@ public class CourseServiceImpl implements CourseService {
     @Autowired
     StudentRepository studentRepository;
 
-    public List<Course> getCourses(){
-        return courseRepository.findAll();
+    public CourseDTO convertCourseToDTO(Course course) {
+
+        CourseDTO courseDTO = new CourseDTO();
+        courseDTO.setName(course.getName());
+
+        courseDTO.setStudentsNames(course.getStudentsEnrolled()
+                .stream().map(
+                        User::getName
+                ).collect(Collectors.toSet()));
+
+        courseDTO.setSubjectsNames(course.getSubjects()
+                .stream().map(
+                        Subject::getName
+                ).collect(Collectors.toSet()));
+
+        return courseDTO;
     }
 
-    public Course getCourseById(Long id){
-        return courseRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
+    public List<CourseDTO> getCourses() {
+        return courseRepository.findAll().stream()
+                .map(this::convertCourseToDTO)
+                .collect(Collectors.toList());
     }
 
-    public Course createCourse(Course newCourse){
-        if (newCourse != null){
-            return courseRepository.save(newCourse);
-        }else {
-            throw new UserNotCreatedException();
+    public CourseDTO getCourseById(Long id) {
+        Course course = courseRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
+
+        return convertCourseToDTO(course);
+    }
+
+    public CourseDTO createCourse(Course newCourse) {
+        if (newCourse != null) {
+            courseRepository.save(newCourse);
+            return convertCourseToDTO(newCourse);
         }
+        throw new UserNotCreatedException();
     }
 
-    public Course updateCourse(Long id, Course newCourse) {
-        if (courseRepository.existsById(id) && newCourse != null){
-            Course course = courseRepository.findById(id).orElseThrow(() -> new UserNotUpdatedException(id));
+    public CourseDTO updateCourse(Long id, Course newCourse) {
+        if (courseRepository.existsById(id) && newCourse != null) {
+            Course course = courseRepository.findById(id)
+                    .orElseThrow(() -> new UserNotUpdatedException(id));
 
             course.setName(newCourse.getName());
+            courseRepository.save(course);
 
-            return courseRepository.save(course);
-        }else{
+            return convertCourseToDTO(course);
+        } else {
             throw new UserNotUpdatedException(id);
         }
     }
 
     public String deleteCourse(Long id) {
-        if(courseRepository.existsById(id)){
+        if (courseRepository.existsById(id)) {
             courseRepository.deleteById(id);
             return "Course deleted";
         }
         throw new UserNotDeletedException(id);
     }
 
-    public Course enrollUser(Long userId, Long courseId){
-        if(courseRepository.existsById(courseId) && studentRepository.existsById(userId)){
-            Student student = studentRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
+    public CourseDTO enrollUser(Long userId, Long courseId) {
+        if (courseRepository.existsById(courseId) && studentRepository.existsById(userId)) {
+            Student student = studentRepository.findById(userId)
+                    .orElseThrow(() -> new UserNotFoundException(userId));
             Course course = courseRepository.findById(courseId)
                     .orElseThrow(() -> new UserNotFoundException(courseId));
 
@@ -72,7 +100,10 @@ public class CourseServiceImpl implements CourseService {
             studentRepository.save(student);
             courseRepository.save(course);
 
-            return courseRepository.findById(courseId).orElseThrow(() -> new UserNotFoundException(courseId));
+            return convertCourseToDTO(
+                    courseRepository.findById(courseId)
+                            .orElseThrow(() -> new UserNotFoundException(courseId))
+            );
         }
         throw new UserNotFoundException(userId);
     }
