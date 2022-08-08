@@ -25,8 +25,12 @@ public class SubjectServiceImpl implements SubjectService {
         SubjectDTO subjectDTO = new SubjectDTO();
         subjectDTO.setName(subject.getName());
         subjectDTO.setDescription(subject.getDescription());
-        subjectDTO.setCourseName(subject.getCourse().getName());
-        subjectDTO.setTeacherName(subject.getTeacher().getName());
+
+        if(subject.getCourse()!=null)
+            subjectDTO.setCourseName(subject.getCourse().getName());
+
+        if(subject.getTeacher()!=null)
+            subjectDTO.setTeacherName(subject.getTeacher().getName());
 
         return subjectDTO;
     }

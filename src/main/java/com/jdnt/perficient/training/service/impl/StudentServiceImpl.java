@@ -53,9 +53,10 @@ public class StudentServiceImpl implements StudentService {
     public CourseDTO updateCourse(Long studentId, Long courseId){
         if(studentRepository.existsById(studentId) && courseRepository.existsById(courseId) ){
             Student student = studentRepository.findById(studentId).get();
-            student.setCourse(courseRepository.findById(courseId).get());
-
             Course course = courseRepository.findById(courseId).get();
+
+            student.setCourse(course);
+
             if(course.getStudentsEnrolled()!=null){
                 course.getStudentsEnrolled().add(student);
             }else {

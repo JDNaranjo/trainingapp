@@ -1,6 +1,7 @@
 package com.jdnt.perficient.training.controller;
 
 import com.jdnt.perficient.training.DTO.CourseDTO;
+import com.jdnt.perficient.training.DTO.SubjectDTO;
 import com.jdnt.perficient.training.entity.Course;
 import com.jdnt.perficient.training.service.impl.CourseServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +46,11 @@ public class CourseController {
     @PutMapping("/{userId}/{courseId}")
     public ResponseEntity<CourseDTO> enrollUser(@PathVariable Long userId, @PathVariable Long courseId){
         return new ResponseEntity<CourseDTO>(courseService.enrollUser(userId, courseId), HttpStatus.OK);
+    }
+
+    @PatchMapping("/{courseId}/{subjectId}")
+    public ResponseEntity<SubjectDTO> assignSubject(@PathVariable Long courseId, @PathVariable Long subjectId){
+        return new ResponseEntity<SubjectDTO>(courseService.assignSubject(courseId, subjectId), HttpStatus.OK);
     }
 
 }

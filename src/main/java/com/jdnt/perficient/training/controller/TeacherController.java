@@ -1,5 +1,7 @@
 package com.jdnt.perficient.training.controller;
 
+import com.jdnt.perficient.training.DTO.CourseDTO;
+import com.jdnt.perficient.training.DTO.SubjectDTO;
 import com.jdnt.perficient.training.DTO.TeacherDTO;
 import com.jdnt.perficient.training.entity.Teacher;
 import com.jdnt.perficient.training.service.TeacherService;
@@ -16,6 +18,11 @@ public class TeacherController {
 
     @Autowired
     private TeacherService teacherService;
+
+    @PutMapping(value = "/{teacherId}/{subjectId}")
+    public ResponseEntity<SubjectDTO> updateCourse(@PathVariable Long teacherId, @PathVariable Long subjectId){
+        return new ResponseEntity<SubjectDTO>(teacherService.updateSubject(teacherId, subjectId), HttpStatus.OK);
+    }
 
     @GetMapping
     public List<TeacherDTO> getTeachers(){

@@ -1,6 +1,7 @@
 package com.jdnt.perficient.training.service.impl;
 
 import com.jdnt.perficient.training.DTO.CourseDTO;
+import com.jdnt.perficient.training.DTO.SubjectDTO;
 import com.jdnt.perficient.training.entity.Student;
 import com.jdnt.perficient.training.entity.Subject;
 import com.jdnt.perficient.training.exception.UserNotCreatedException;
@@ -11,10 +12,13 @@ import com.jdnt.perficient.training.entity.Course;
 import com.jdnt.perficient.training.entity.User;
 import com.jdnt.perficient.training.repository.CourseRepository;
 import com.jdnt.perficient.training.repository.StudentRepository;
+import com.jdnt.perficient.training.repository.SubjectRepository;
 import com.jdnt.perficient.training.service.CourseService;
+import com.jdnt.perficient.training.service.SubjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,6 +30,12 @@ public class CourseServiceImpl implements CourseService {
 
     @Autowired
     StudentRepository studentRepository;
+
+    @Autowired
+    SubjectRepository subjectRepository;
+
+    @Autowired
+    SubjectService subjectService;
 
     public CourseDTO convertCourseToDTO(Course course) {
 
@@ -108,4 +118,25 @@ public class CourseServiceImpl implements CourseService {
         throw new UserNotFoundException(userId);
     }
 
+    public SubjectDTO assignSubject(Long courseId, Long subjectId) {
+        Course course = courseRepository.findById(courseId).orElseThrow(
+                () -> new UserNotFoundException(courseId));
+        Subject subject = subjectRepository.findById(subjectId).orElseThrow(
+                () -> new UserNotFoundException(subjectId));
+
+        subject.setCourse(course);
+
+        if (course.getSubjects()!= null) {
+            course.getSubjects().add(subject);
+        }else {
+            course.setSubjects(new HashSet<>());
+            course.getSubjects().add(subject);
+        }
+
+        courseRepository.save(course);
+        subjectRepository.save(subject);
+
+        return subjectService.convertSubjectToDTO(subject);
+
+    }
 }

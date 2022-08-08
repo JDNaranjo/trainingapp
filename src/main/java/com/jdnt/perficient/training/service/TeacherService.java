@@ -8,18 +8,20 @@ import java.util.List;
 
 public interface TeacherService {
 
-    public List<SubjectDTO> getSubjects(Long id);
+    SubjectDTO updateSubject(Long teacherId, Long subjectId);
 
-    public String deleteSubject(Long teacherId, Long subjectId);
+    List<SubjectDTO> getSubjects(Long id);
 
-    public List<TeacherDTO> getTeachers();
+    String deleteSubject(Long teacherId, Long subjectId);
 
-    public TeacherDTO getTeacherById(Long id);
+    List<TeacherDTO> getTeachers();
 
-    public TeacherDTO createTeacher(Teacher newUser);
+    TeacherDTO getTeacherById(Long id);
 
-    public TeacherDTO updateTeacher(Long id, Teacher newUser);
+    TeacherDTO createTeacher(Teacher newUser);
 
-    public String deleteTeacher(Long id);
+    TeacherDTO updateTeacher(Long id, Teacher newUser);
+
+    String deleteTeacher(Long id);
 
 }

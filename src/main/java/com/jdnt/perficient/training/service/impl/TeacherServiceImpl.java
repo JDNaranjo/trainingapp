@@ -2,6 +2,8 @@ package com.jdnt.perficient.training.service.impl;
 
 import com.jdnt.perficient.training.DTO.SubjectDTO;
 import com.jdnt.perficient.training.DTO.TeacherDTO;
+import com.jdnt.perficient.training.entity.Course;
+import com.jdnt.perficient.training.entity.Student;
 import com.jdnt.perficient.training.entity.Subject;
 import com.jdnt.perficient.training.entity.Teacher;
 import com.jdnt.perficient.training.exception.UserNotCreatedException;
@@ -15,6 +17,8 @@ import com.jdnt.perficient.training.service.TeacherService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -43,6 +47,28 @@ public class TeacherServiceImpl implements TeacherService {
                 ).collect(Collectors.toList()));
 
         return teacherDTO;
+    }
+
+    public SubjectDTO updateSubject(Long teacherId, Long subjectId) {
+        if(teacherRepository.existsById(teacherId) && subjectRepository.existsById(subjectId) ) {
+            Teacher teacher = teacherRepository.findById(teacherId).get();
+            Subject subject = subjectRepository.findById(subjectId).get();
+
+            subject.setTeacher(teacher);
+
+            if(teacher.getSubjects()!= null){
+                teacher.getSubjects().add(subject);
+            }else {
+                teacher.setSubjects(new ArrayList<Subject>());
+                teacher.getSubjects().add(subject);
+            }
+
+            teacherRepository.save(teacher);
+            subjectRepository.save(subject);
+
+            return subjectService.convertSubjectToDTO(subject);
+        }
+        throw new UserNotUpdatedException(teacherId);
     }
 
     public List<SubjectDTO> getSubjects(Long id) {
