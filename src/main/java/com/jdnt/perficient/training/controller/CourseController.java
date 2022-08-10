@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -25,32 +26,32 @@ public class CourseController {
 
     @GetMapping(value = "/{id}")
     public ResponseEntity<CourseDTO> getCourseById(@PathVariable Long id){
-        return new ResponseEntity<CourseDTO>(courseService.getCourseById(id), HttpStatus.OK);
+        return new ResponseEntity<>(courseService.getCourseById(id), HttpStatus.OK);
     }
 
     @PostMapping(path = "/")
-    public ResponseEntity<CourseDTO> createCourse(@RequestBody Course newCourse){
-        return new ResponseEntity<CourseDTO>(courseService.createCourse(newCourse), HttpStatus.OK);
+    public ResponseEntity<CourseDTO> createCourse(@Valid @RequestBody Course newCourse){
+        return new ResponseEntity<>(courseService.createCourse(newCourse), HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CourseDTO> updateCourse(@PathVariable Long id, @RequestBody Course newCourse){
-        return new ResponseEntity<CourseDTO>(courseService.updateCourse(id, newCourse), HttpStatus.OK);
+    public ResponseEntity<CourseDTO> updateCourse(@PathVariable Long id, @Valid @RequestBody Course newCourse){
+        return new ResponseEntity<>(courseService.updateCourse(id, newCourse), HttpStatus.ACCEPTED);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteCourse(@PathVariable Long id){
-        return new ResponseEntity<String>(courseService.deleteCourse(id), HttpStatus.OK);
+        return new ResponseEntity<>(courseService.deleteCourse(id), HttpStatus.OK);
     }
 
     @PutMapping("/{userId}/{courseId}")
     public ResponseEntity<CourseDTO> enrollUser(@PathVariable Long userId, @PathVariable Long courseId){
-        return new ResponseEntity<CourseDTO>(courseService.enrollUser(userId, courseId), HttpStatus.OK);
+        return new ResponseEntity<>(courseService.enrollUser(userId, courseId), HttpStatus.ACCEPTED);
     }
 
     @PatchMapping("/{courseId}/{subjectId}")
     public ResponseEntity<SubjectDTO> assignSubject(@PathVariable Long courseId, @PathVariable Long subjectId){
-        return new ResponseEntity<SubjectDTO>(courseService.assignSubject(courseId, subjectId), HttpStatus.OK);
+        return new ResponseEntity<>(courseService.assignSubject(courseId, subjectId), HttpStatus.ACCEPTED);
     }
 
 }

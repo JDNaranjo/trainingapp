@@ -42,15 +42,17 @@ public class CourseServiceImpl implements CourseService {
         CourseDTO courseDTO = new CourseDTO();
         courseDTO.setName(course.getName());
 
-        courseDTO.setStudentsNames(course.getStudentsEnrolled()
-                .stream().map(
-                        User::getName
-                ).collect(Collectors.toSet()));
+        if (course.getStudentsEnrolled()!=null)
+            courseDTO.setStudentsNames(course.getStudentsEnrolled()
+                    .stream().map(
+                            User::getName
+                    ).collect(Collectors.toSet()));
 
-        courseDTO.setSubjectsNames(course.getSubjects()
-                .stream().map(
-                        Subject::getName
-                ).collect(Collectors.toSet()));
+        if(course.getSubjects()!=null)
+            courseDTO.setSubjectsNames(course.getSubjects()
+                    .stream().map(
+                            Subject::getName
+                    ).collect(Collectors.toSet()));
 
         return courseDTO;
     }
@@ -72,7 +74,7 @@ public class CourseServiceImpl implements CourseService {
             courseRepository.save(newCourse);
             return convertCourseToDTO(newCourse);
         }
-        throw new UserNotCreatedException();
+        throw new UserNotCreatedException("Course can not be null");
     }
 
     public CourseDTO updateCourse(Long id, Course newCourse) {

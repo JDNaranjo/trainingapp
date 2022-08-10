@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -26,27 +27,27 @@ public class StudentController {
 
     @GetMapping(value = "/{id}")
     public ResponseEntity<StudentDTO> getStudentById(@PathVariable Long id){
-        return new ResponseEntity<StudentDTO>(studentService.getStudentById(id), HttpStatus.OK);
+        return new ResponseEntity<>(studentService.getStudentById(id), HttpStatus.OK);
     }
 
     @PutMapping(value = "/{studentId}/{courseId}")
     public ResponseEntity<CourseDTO> updateCourse(@PathVariable Long studentId, @PathVariable Long courseId){
-        return new ResponseEntity<CourseDTO>(studentService.updateCourse(studentId, courseId), HttpStatus.OK);
+        return new ResponseEntity<>(studentService.updateCourse(studentId, courseId), HttpStatus.ACCEPTED);
     }
 
     @PostMapping(path = "/")
-    public ResponseEntity<StudentDTO> createStudent(@RequestBody Student newStudent){
-        return new ResponseEntity<StudentDTO>(studentService.createStudent(newStudent), HttpStatus.OK);
+    public ResponseEntity<StudentDTO> createStudent(@Valid @RequestBody Student newStudent){
+        return new ResponseEntity<>(studentService.createStudent(newStudent), HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<StudentDTO> updateStudent(@PathVariable Long id, @RequestBody Student newStudent){
-        return new ResponseEntity<StudentDTO>(studentService.updateStudent(id, newStudent), HttpStatus.OK);
+    public ResponseEntity<StudentDTO> updateStudent(@PathVariable Long id, @Valid @RequestBody Student newStudent){
+        return new ResponseEntity<>(studentService.updateStudent(id, newStudent), HttpStatus.ACCEPTED);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteStudent(@PathVariable Long id){
-        return new ResponseEntity<String>(studentService.deleteStudent(id), HttpStatus.OK);
+        return new ResponseEntity<>(studentService.deleteStudent(id), HttpStatus.OK);
     }
 
 }

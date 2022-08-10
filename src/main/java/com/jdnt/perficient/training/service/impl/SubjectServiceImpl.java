@@ -53,7 +53,7 @@ public class SubjectServiceImpl implements SubjectService {
                     subjectRepository.save(newSubject)
             );
         }else {
-            throw new UserNotCreatedException();
+            throw new UserNotCreatedException("Subject can not be null");
         }
     }
 

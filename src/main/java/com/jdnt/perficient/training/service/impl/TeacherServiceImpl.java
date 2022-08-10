@@ -41,10 +41,11 @@ public class TeacherServiceImpl implements TeacherService {
         teacherDTO.setUsername(teacher.getUsername());
         teacherDTO.setEmail(teacher.getEmail());
 
-        teacherDTO.setSubjectNames(teacher.getSubjects()
-                .stream().map(
-                        Subject::getName
-                ).collect(Collectors.toList()));
+        if(teacher.getSubjects()!=null)
+            teacherDTO.setSubjectNames(teacher.getSubjects()
+                    .stream().map(
+                            Subject::getName
+                    ).collect(Collectors.toList()));
 
         return teacherDTO;
     }
@@ -72,24 +73,22 @@ public class TeacherServiceImpl implements TeacherService {
     }
 
     public List<SubjectDTO> getSubjects(Long id) {
-        if(teacherRepository.existsById(id)){
-            return teacherRepository.findById(id).get().getSubjects()
-                    .stream().map(subjectService::convertSubjectToDTO)
-                    .collect(Collectors.toList());
-        }
-        throw new UserNotFoundException(id);
+        return teacherRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException(id))
+                .getSubjects()
+                .stream().map(subjectService::convertSubjectToDTO)
+                .collect(Collectors.toList());
     }
 
     public String deleteSubject(Long teacherId, Long subjectId) {
-        if(teacherRepository.existsById(teacherId)){
-            Teacher teacher = teacherRepository.findById(teacherId).get();
-            teacher.getSubjects().remove(
-                    subjectRepository.findById(subjectId).orElseThrow(
-                            () -> new UserNotFoundException(subjectId)
-                    ));
-            return "Subject deleted";
-        }
-        throw new UserNotFoundException(subjectId);
+        Teacher teacher = teacherRepository.findById(teacherId)
+                .orElseThrow(() -> new UserNotFoundException(teacherId));
+
+        teacher.getSubjects().remove(
+                subjectRepository.findById(subjectId).orElseThrow(
+                        () -> new UserNotFoundException(subjectId)
+                ));
+        return "Subject deleted";
     }
 
     public List<TeacherDTO> getTeachers() {
@@ -111,7 +110,7 @@ public class TeacherServiceImpl implements TeacherService {
                     teacherRepository.save(newUser)
             );
         }
-        throw new UserNotCreatedException();
+        throw new UserNotCreatedException("Teacher can not be null");
     }
 
     public TeacherDTO updateTeacher(Long id, Teacher newUser) {

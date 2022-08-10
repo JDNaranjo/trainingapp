@@ -30,13 +30,12 @@ public class UserServiceImpl implements UserService {
         if (newUser != null){
             return userRepository.save(newUser);
         }else {
-            throw new UserNotCreatedException();
+            throw new UserNotCreatedException("User can not be null");
         }
     }
 
     public User updateUser(Long id, User newUser) {
-        if (userRepository.existsById(id) && newUser != null){
-            User user = userRepository.findById(id).get();
+            User user = userRepository.findById(id).orElseThrow(() -> new UserNotUpdatedException(id));
 
             user.setEmail(newUser.getEmail());
             user.setLastName(newUser.getLastName());
@@ -45,8 +44,7 @@ public class UserServiceImpl implements UserService {
             user.setUsername(newUser.getUsername());
 
             return userRepository.save(user);
-        }
-        throw new UserNotUpdatedException(id);
+
     }
 
     public String deleteUser(Long id) {
