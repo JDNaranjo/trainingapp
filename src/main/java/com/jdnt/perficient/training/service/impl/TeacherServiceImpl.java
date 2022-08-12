@@ -1,26 +1,26 @@
 package com.jdnt.perficient.training.service.impl;
 
-import com.jdnt.perficient.training.DTO.SubjectDTO;
-import com.jdnt.perficient.training.DTO.TeacherDTO;
-import com.jdnt.perficient.training.entity.Course;
-import com.jdnt.perficient.training.entity.Student;
+import com.jdnt.perficient.training.dto.SubjectDTO;
+import com.jdnt.perficient.training.dto.TeacherDTO;
 import com.jdnt.perficient.training.entity.Subject;
 import com.jdnt.perficient.training.entity.Teacher;
-import com.jdnt.perficient.training.exception.UserNotCreatedException;
-import com.jdnt.perficient.training.exception.UserNotDeletedException;
-import com.jdnt.perficient.training.exception.UserNotFoundException;
-import com.jdnt.perficient.training.exception.UserNotUpdatedException;
+import com.jdnt.perficient.training.exception.NotCreatedException;
+import com.jdnt.perficient.training.exception.NotDeletedException;
+import com.jdnt.perficient.training.exception.NotFoundException;
+import com.jdnt.perficient.training.exception.NotUpdatedException;
 import com.jdnt.perficient.training.repository.SubjectRepository;
 import com.jdnt.perficient.training.repository.TeacherRepository;
 import com.jdnt.perficient.training.service.SubjectService;
 import com.jdnt.perficient.training.service.TeacherService;
+import com.jdnt.perficient.training.utility.MapperToDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static com.jdnt.perficient.training.utility.MapperToDto.convertTeacherToDTO;
 
 @Service
 public class TeacherServiceImpl implements TeacherService {
@@ -30,77 +30,59 @@ public class TeacherServiceImpl implements TeacherService {
     @Autowired
     SubjectRepository subjectRepository;
 
-    @Autowired
-    SubjectService subjectService;
-
-    public TeacherDTO convertTeacherToDTO(Teacher teacher) {
-
-        TeacherDTO teacherDTO = new TeacherDTO();
-        teacherDTO.setName(teacher.getName());
-        teacherDTO.setLastName(teacher.getLastName());
-        teacherDTO.setUsername(teacher.getUsername());
-        teacherDTO.setEmail(teacher.getEmail());
-
-        if(teacher.getSubjects()!=null)
-            teacherDTO.setSubjectNames(teacher.getSubjects()
-                    .stream().map(
-                            Subject::getName
-                    ).collect(Collectors.toList()));
-
-        return teacherDTO;
-    }
 
     public SubjectDTO updateSubject(Long teacherId, Long subjectId) {
-        if(teacherRepository.existsById(teacherId) && subjectRepository.existsById(subjectId) ) {
-            Teacher teacher = teacherRepository.findById(teacherId).get();
-            Subject subject = subjectRepository.findById(subjectId).get();
+        Teacher teacher = teacherRepository.findById(teacherId).orElseThrow(
+                () -> new NotFoundException("Teacher: "+teacherId+" was not found")
+        );
+        Subject subject = subjectRepository.findById(subjectId).orElseThrow(
+                () -> new NotFoundException("Subject: "+ subjectId+" was not found")
+        );
 
-            subject.setTeacher(teacher);
+        subject.setTeacher(teacher);
 
-            if(teacher.getSubjects()!= null){
-                teacher.getSubjects().add(subject);
-            }else {
-                teacher.setSubjects(new ArrayList<Subject>());
-                teacher.getSubjects().add(subject);
-            }
-
-            teacherRepository.save(teacher);
-            subjectRepository.save(subject);
-
-            return subjectService.convertSubjectToDTO(subject);
+        if(teacher.getSubjects()!= null){
+            teacher.getSubjects().add(subject);
+        }else {
+            teacher.setSubjects(new ArrayList<>());
+            teacher.getSubjects().add(subject);
         }
-        throw new UserNotUpdatedException(teacherId);
+
+        teacherRepository.save(teacher);
+        subjectRepository.save(subject);
+
+        return MapperToDto.convertSubjectToDTO(subject);
     }
 
     public List<SubjectDTO> getSubjects(Long id) {
         return teacherRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException(id))
+                .orElseThrow(() -> new NotFoundException("Teacher: "+id+" not found"))
                 .getSubjects()
-                .stream().map(subjectService::convertSubjectToDTO)
-                .collect(Collectors.toList());
+                .stream().map(MapperToDto::convertSubjectToDTO)
+                .toList();
     }
 
     public String deleteSubject(Long teacherId, Long subjectId) {
         Teacher teacher = teacherRepository.findById(teacherId)
-                .orElseThrow(() -> new UserNotFoundException(teacherId));
+                .orElseThrow(() -> new NotFoundException("Teacher: "+teacherId+" not found"));
 
         teacher.getSubjects().remove(
                 subjectRepository.findById(subjectId).orElseThrow(
-                        () -> new UserNotFoundException(subjectId)
+                        () -> new NotFoundException("Subject: "+subjectId+" not found")
                 ));
         return "Subject deleted";
     }
 
     public List<TeacherDTO> getTeachers() {
         return teacherRepository.findAll()
-                .stream().map(this::convertTeacherToDTO)
-                .collect(Collectors.toList());
+                .stream().map(MapperToDto::convertTeacherToDTO)
+                .toList();
     }
 
     public TeacherDTO getTeacherById(Long id) {
         return convertTeacherToDTO(
                 teacherRepository.findById(id)
-                        .orElseThrow(() -> new UserNotFoundException(id))
+                        .orElseThrow(() -> new NotFoundException("Teacher: "+id+" not found"))
         );
     }
 
@@ -110,12 +92,14 @@ public class TeacherServiceImpl implements TeacherService {
                     teacherRepository.save(newUser)
             );
         }
-        throw new UserNotCreatedException("Teacher can not be null");
+        throw new NotCreatedException("Teacher can not be null");
     }
 
     public TeacherDTO updateTeacher(Long id, Teacher newUser) {
-        if (teacherRepository.existsById(id) && newUser != null){
-            Teacher user = teacherRepository.findById(id).get();
+        if (newUser != null){
+            Teacher user = teacherRepository.findById(id).orElseThrow(
+                    () -> new NotFoundException("Teacher: "+id+" was not found")
+            );
 
             user.setEmail(newUser.getEmail());
             user.setLastName(newUser.getLastName());
@@ -128,7 +112,7 @@ public class TeacherServiceImpl implements TeacherService {
                     teacherRepository.save(user)
             );
         }
-        throw new UserNotUpdatedException(id);
+        throw new NotUpdatedException("Teacher: "+id+" is null and didn't update");
     }
 
     public String deleteTeacher(Long id) {
@@ -136,6 +120,6 @@ public class TeacherServiceImpl implements TeacherService {
             teacherRepository.deleteById(id);
             return "User deleted";
         }
-        throw new UserNotDeletedException(id);
+        throw new NotDeletedException("Teacher: "+id+" not found to be deleted");
     }
 }

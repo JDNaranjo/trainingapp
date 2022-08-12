@@ -1,9 +1,9 @@
 package com.jdnt.perficient.training.service.impl;
 
-import com.jdnt.perficient.training.exception.UserNotCreatedException;
-import com.jdnt.perficient.training.exception.UserNotDeletedException;
-import com.jdnt.perficient.training.exception.UserNotFoundException;
-import com.jdnt.perficient.training.exception.UserNotUpdatedException;
+import com.jdnt.perficient.training.exception.NotCreatedException;
+import com.jdnt.perficient.training.exception.NotDeletedException;
+import com.jdnt.perficient.training.exception.NotFoundException;
+import com.jdnt.perficient.training.exception.NotUpdatedException;
 import com.jdnt.perficient.training.entity.User;
 import com.jdnt.perficient.training.repository.UserRepository;
 import com.jdnt.perficient.training.service.UserService;
@@ -23,28 +23,28 @@ public class UserServiceImpl implements UserService {
     }
 
     public User getUserById(Long id){
-        return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
+        return userRepository.findById(id).orElseThrow(() -> new NotFoundException("User: "+id+" not found"));
     }
 
     public User createUser(User newUser){
         if (newUser != null){
             return userRepository.save(newUser);
         }else {
-            throw new UserNotCreatedException("User can not be null");
+            throw new NotCreatedException("User can not be null");
         }
     }
 
     public User updateUser(Long id, User newUser) {
-            User user = userRepository.findById(id).orElseThrow(() -> new UserNotUpdatedException(id));
+        User user = userRepository.findById(id).orElseThrow(
+                () -> new NotUpdatedException("User "+ id +" was not found"));
 
-            user.setEmail(newUser.getEmail());
-            user.setLastName(newUser.getLastName());
-            user.setName(newUser.getName());
-            user.setPassword(newUser.getPassword());
-            user.setUsername(newUser.getUsername());
+        user.setEmail(newUser.getEmail());
+        user.setLastName(newUser.getLastName());
+        user.setName(newUser.getName());
+        user.setPassword(newUser.getPassword());
+        user.setUsername(newUser.getUsername());
 
-            return userRepository.save(user);
-
+        return userRepository.save(user);
     }
 
     public String deleteUser(Long id) {
@@ -52,6 +52,6 @@ public class UserServiceImpl implements UserService {
             userRepository.deleteById(id);
             return "User deleted";
         }
-        throw new UserNotDeletedException(id);
+        throw new NotDeletedException("User: "+id+" not found to be deleted");
     }
 }

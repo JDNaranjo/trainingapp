@@ -1,7 +1,7 @@
 package com.jdnt.perficient.training.service;
 
-import com.jdnt.perficient.training.DTO.CourseDTO;
-import com.jdnt.perficient.training.DTO.StudentDTO;
+import com.jdnt.perficient.training.dto.CourseDTO;
+import com.jdnt.perficient.training.dto.StudentDTO;
 import com.jdnt.perficient.training.entity.Student;
 
 import java.util.List;

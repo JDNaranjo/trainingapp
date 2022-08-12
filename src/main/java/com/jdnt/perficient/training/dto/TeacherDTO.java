@@ -1,4 +1,4 @@
-package com.jdnt.perficient.training.DTO;
+package com.jdnt.perficient.training.dto;
 
 import lombok.Data;
 

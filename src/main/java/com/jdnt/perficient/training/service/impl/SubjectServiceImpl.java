@@ -1,18 +1,21 @@
 package com.jdnt.perficient.training.service.impl;
 
-import com.jdnt.perficient.training.DTO.SubjectDTO;
-import com.jdnt.perficient.training.exception.UserNotCreatedException;
-import com.jdnt.perficient.training.exception.UserNotDeletedException;
-import com.jdnt.perficient.training.exception.UserNotFoundException;
-import com.jdnt.perficient.training.exception.UserNotUpdatedException;
+import com.jdnt.perficient.training.dto.SubjectDTO;
+import com.jdnt.perficient.training.exception.NotCreatedException;
+import com.jdnt.perficient.training.exception.NotDeletedException;
+import com.jdnt.perficient.training.exception.NotFoundException;
+import com.jdnt.perficient.training.exception.NotUpdatedException;
 import com.jdnt.perficient.training.entity.Subject;
 import com.jdnt.perficient.training.repository.SubjectRepository;
 import com.jdnt.perficient.training.service.SubjectService;
+import com.jdnt.perficient.training.utility.MapperToDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static com.jdnt.perficient.training.utility.MapperToDto.convertSubjectToDTO;
 
 @Service
 public class SubjectServiceImpl implements SubjectService {
@@ -20,30 +23,15 @@ public class SubjectServiceImpl implements SubjectService {
     @Autowired
     SubjectRepository subjectRepository;
 
-    public SubjectDTO convertSubjectToDTO(Subject subject) {
-
-        SubjectDTO subjectDTO = new SubjectDTO();
-        subjectDTO.setName(subject.getName());
-        subjectDTO.setDescription(subject.getDescription());
-
-        if(subject.getCourse()!=null)
-            subjectDTO.setCourseName(subject.getCourse().getName());
-
-        if(subject.getTeacher()!=null)
-            subjectDTO.setTeacherName(subject.getTeacher().getName());
-
-        return subjectDTO;
-    }
-
     public List<SubjectDTO> getSubjects(){
         return subjectRepository.findAll().stream()
-                .map(this::convertSubjectToDTO)
+                .map(MapperToDto::convertSubjectToDTO)
                 .collect(Collectors.toList());
     }
 
     public SubjectDTO getSubjectById(Long id){
         return convertSubjectToDTO(
-                subjectRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id))
+                subjectRepository.findById(id).orElseThrow(() -> new NotFoundException("Subject: "+id+" not found"))
         );
     }
 
@@ -53,13 +41,14 @@ public class SubjectServiceImpl implements SubjectService {
                     subjectRepository.save(newSubject)
             );
         }else {
-            throw new UserNotCreatedException("Subject can not be null");
+            throw new NotCreatedException("Subject can not be null");
         }
     }
 
     public SubjectDTO updateSubject(Long id, Subject newSubject) {
-        if (subjectRepository.existsById(id) && newSubject != null){
-            Subject subject = subjectRepository.findById(id).get();
+        if (newSubject != null){
+            Subject subject = subjectRepository.findById(id).orElseThrow(
+                    () -> new NotFoundException("Subject: "+id+" cant be found"));
 
             subject.setName(newSubject.getName());
             subject.setDescription(newSubject.getDescription());
@@ -68,9 +57,8 @@ public class SubjectServiceImpl implements SubjectService {
             return convertSubjectToDTO(
                     subjectRepository.save(subject)
                 );
-        }else{
-            throw new UserNotUpdatedException(id);
         }
+            throw new NotUpdatedException("Course: "+id+"is null and didn't update");
     }
 
     public String deleteCourse(Long id) {
@@ -78,7 +66,7 @@ public class SubjectServiceImpl implements SubjectService {
             subjectRepository.deleteById(id);
             return "Subject deleted";
         }
-        throw new UserNotDeletedException(id);
+        throw new NotDeletedException("Course: "+id+" not found to be deleted");
     }
 
 }

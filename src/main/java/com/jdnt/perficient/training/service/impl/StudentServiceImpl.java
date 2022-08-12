@@ -1,25 +1,25 @@
 package com.jdnt.perficient.training.service.impl;
 
-import com.jdnt.perficient.training.DTO.CourseDTO;
-import com.jdnt.perficient.training.DTO.StudentDTO;
+import com.jdnt.perficient.training.dto.CourseDTO;
+import com.jdnt.perficient.training.dto.StudentDTO;
 import com.jdnt.perficient.training.entity.Course;
 import com.jdnt.perficient.training.entity.Student;
-import com.jdnt.perficient.training.entity.User;
-import com.jdnt.perficient.training.exception.UserNotCreatedException;
-import com.jdnt.perficient.training.exception.UserNotDeletedException;
-import com.jdnt.perficient.training.exception.UserNotFoundException;
-import com.jdnt.perficient.training.exception.UserNotUpdatedException;
+import com.jdnt.perficient.training.exception.NotCreatedException;
+import com.jdnt.perficient.training.exception.NotDeletedException;
+import com.jdnt.perficient.training.exception.NotFoundException;
+import com.jdnt.perficient.training.exception.NotUpdatedException;
 import com.jdnt.perficient.training.repository.CourseRepository;
 import com.jdnt.perficient.training.repository.StudentRepository;
 import com.jdnt.perficient.training.repository.UserRepository;
-import com.jdnt.perficient.training.service.CourseService;
 import com.jdnt.perficient.training.service.StudentService;
+import com.jdnt.perficient.training.utility.MapperToDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.stream.Stream;
+
+import static com.jdnt.perficient.training.utility.MapperToDto.convertStudentToDTO;
 
 @Service
 public class StudentServiceImpl implements StudentService {
@@ -29,35 +29,21 @@ public class StudentServiceImpl implements StudentService {
     @Autowired
     CourseRepository courseRepository;
     @Autowired
-    CourseService courseService;
-    @Autowired
     UserRepository userRepository;
 
-    public StudentDTO convertStudentToDTO(Student student) {
-
-        StudentDTO studentDTO = new StudentDTO();
-        studentDTO.setName(student.getName());
-        studentDTO.setLastName(student.getLastName());
-        studentDTO.setUsername(student.getUsername());
-        studentDTO.setEmail(student.getEmail());
-
-        if (student.getCourse()!=null)
-            studentDTO.setCourseName(student.getCourse().getName());
-
-        return studentDTO;
-    }
-
     public CourseDTO getCourse(Long id) {
-        return courseService.convertCourseToDTO(
+        return MapperToDto.convertCourseToDTO(
                 studentRepository.findById(id)
-                        .orElseThrow(() -> new UserNotFoundException(id))
+                        .orElseThrow(() -> new NotFoundException("Course: "+id+" not found"))
                         .getCourse()
         );
     }
 
     public CourseDTO updateCourse(Long studentId, Long courseId){
-        Student student = studentRepository.findById(studentId).orElseThrow(() -> new UserNotFoundException(studentId));
-        Course course = courseRepository.findById(courseId).orElseThrow(() -> new UserNotFoundException(courseId));
+        Student student = studentRepository.findById(studentId).orElseThrow(
+                () -> new NotFoundException("Student: "+studentId+" not found"));
+        Course course = courseRepository.findById(courseId).orElseThrow(
+                () -> new NotFoundException("Course: "+courseId+" not found"));
 
         student.setCourse(course);
 
@@ -71,51 +57,51 @@ public class StudentServiceImpl implements StudentService {
         studentRepository.save(student);
         courseRepository.save(course);
 
-        return courseService.convertCourseToDTO(
+        return MapperToDto.convertCourseToDTO(
                 student.getCourse()
         );
     }
 
     public String deleteCourse(Long studentId) {
         studentRepository.findById(studentId)
-                .orElseThrow(() -> new UserNotFoundException(studentId))
+                .orElseThrow(() -> new NotFoundException("Student: "+studentId+" not found"))
                 .setCourse(null);
         return "User deleted";
     }
 
     public List<StudentDTO> getStudents() {
         return studentRepository.findAll()
-                .stream().map(this::convertStudentToDTO)
+                .stream().map(MapperToDto::convertStudentToDTO)
                 .toList();
     }
 
     public StudentDTO getStudentById(Long id) {
         return convertStudentToDTO(
                 studentRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException(id))
+                .orElseThrow(() -> new NotFoundException("Student: "+id+" not found"))
         );
     }
 
     public StudentDTO createStudent(Student newUser) {
         if(newUser!=null){
 
-            long repited = userRepository.findAll().stream()
+            long repeated = userRepository.findAll().stream()
                     .filter(user -> user.getEmail().equals(newUser.getEmail())).count();
 
-            if(repited==0){
+            if(repeated==0){
                 return convertStudentToDTO(
                         studentRepository.save(newUser)
                 );
             }
-            throw new UserNotCreatedException("email already taken");
+            throw new NotCreatedException("email already taken");
         }
-        throw new UserNotCreatedException("Student can not be null");
+        throw new NotCreatedException("Student can not be null");
     }
 
     public StudentDTO updateStudent(Long id, Student newUser) {
         if (newUser != null){
             Student user = studentRepository.findById(id)
-                    .orElseThrow(() -> new UserNotFoundException(id));
+                    .orElseThrow(() -> new NotFoundException("Student:"+ id +" not found"));
 
             user.setEmail(newUser.getEmail());
             user.setLastName(newUser.getLastName());
@@ -128,7 +114,7 @@ public class StudentServiceImpl implements StudentService {
                     studentRepository.save(user)
             );
         }
-        throw new UserNotUpdatedException(id);
+        throw new NotUpdatedException("Student: "+id+"is null and didn't update");
     }
 
     public String deleteStudent(Long id) {
@@ -136,6 +122,6 @@ public class StudentServiceImpl implements StudentService {
             studentRepository.deleteById(id);
             return "User deleted";
         }
-        throw new UserNotDeletedException(id);
+        throw new NotDeletedException("Student: "+id+" not found to be deleted");
     }
 }

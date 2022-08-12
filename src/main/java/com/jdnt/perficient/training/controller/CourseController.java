@@ -1,7 +1,7 @@
 package com.jdnt.perficient.training.controller;
 
-import com.jdnt.perficient.training.DTO.CourseDTO;
-import com.jdnt.perficient.training.DTO.SubjectDTO;
+import com.jdnt.perficient.training.dto.CourseDTO;
+import com.jdnt.perficient.training.dto.SubjectDTO;
 import com.jdnt.perficient.training.entity.Course;
 import com.jdnt.perficient.training.service.impl.CourseServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;

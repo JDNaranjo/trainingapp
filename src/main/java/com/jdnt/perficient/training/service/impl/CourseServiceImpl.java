@@ -1,26 +1,26 @@
 package com.jdnt.perficient.training.service.impl;
 
-import com.jdnt.perficient.training.DTO.CourseDTO;
-import com.jdnt.perficient.training.DTO.SubjectDTO;
+import com.jdnt.perficient.training.dto.CourseDTO;
+import com.jdnt.perficient.training.dto.SubjectDTO;
 import com.jdnt.perficient.training.entity.Student;
 import com.jdnt.perficient.training.entity.Subject;
-import com.jdnt.perficient.training.exception.UserNotCreatedException;
-import com.jdnt.perficient.training.exception.UserNotDeletedException;
-import com.jdnt.perficient.training.exception.UserNotFoundException;
-import com.jdnt.perficient.training.exception.UserNotUpdatedException;
+import com.jdnt.perficient.training.exception.NotCreatedException;
+import com.jdnt.perficient.training.exception.NotDeletedException;
+import com.jdnt.perficient.training.exception.NotFoundException;
+import com.jdnt.perficient.training.exception.NotUpdatedException;
 import com.jdnt.perficient.training.entity.Course;
-import com.jdnt.perficient.training.entity.User;
 import com.jdnt.perficient.training.repository.CourseRepository;
 import com.jdnt.perficient.training.repository.StudentRepository;
 import com.jdnt.perficient.training.repository.SubjectRepository;
 import com.jdnt.perficient.training.service.CourseService;
-import com.jdnt.perficient.training.service.SubjectService;
+import com.jdnt.perficient.training.utility.MapperToDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.stream.Collectors;
+
+import static com.jdnt.perficient.training.utility.MapperToDto.convertCourseToDTO;
 
 @Service
 public class CourseServiceImpl implements CourseService {
@@ -34,37 +34,16 @@ public class CourseServiceImpl implements CourseService {
     @Autowired
     SubjectRepository subjectRepository;
 
-    @Autowired
-    SubjectService subjectService;
-
-    public CourseDTO convertCourseToDTO(Course course) {
-
-        CourseDTO courseDTO = new CourseDTO();
-        courseDTO.setName(course.getName());
-
-        if (course.getStudentsEnrolled()!=null)
-            courseDTO.setStudentsNames(course.getStudentsEnrolled()
-                    .stream().map(
-                            User::getName
-                    ).collect(Collectors.toSet()));
-
-        if(course.getSubjects()!=null)
-            courseDTO.setSubjectsNames(course.getSubjects()
-                    .stream().map(
-                            Subject::getName
-                    ).collect(Collectors.toSet()));
-
-        return courseDTO;
-    }
-
     public List<CourseDTO> getCourses() {
-        return courseRepository.findAll().stream()
-                .map(this::convertCourseToDTO)
-                .collect(Collectors.toList());
+        List<Course> courses = courseRepository.findAll();
+        return courses.stream()
+                .map(MapperToDto::convertCourseToDTO)
+                .toList();
     }
 
     public CourseDTO getCourseById(Long id) {
-        Course course = courseRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
+        Course course = courseRepository.findById(id).orElseThrow(
+                () -> new NotFoundException("Course: "+id+" not found"));
 
         return convertCourseToDTO(course);
     }
@@ -74,21 +53,20 @@ public class CourseServiceImpl implements CourseService {
             courseRepository.save(newCourse);
             return convertCourseToDTO(newCourse);
         }
-        throw new UserNotCreatedException("Course can not be null");
+        throw new NotCreatedException("Course can not be null");
     }
 
     public CourseDTO updateCourse(Long id, Course newCourse) {
-        if (courseRepository.existsById(id) && newCourse != null) {
+        if (newCourse != null) {
             Course course = courseRepository.findById(id)
-                    .orElseThrow(() -> new UserNotUpdatedException(id));
+                    .orElseThrow(() -> new NotUpdatedException("Course: "+id+"is null and didn't update"));
 
             course.setName(newCourse.getName());
             courseRepository.save(course);
 
             return convertCourseToDTO(course);
-        } else {
-            throw new UserNotUpdatedException(id);
         }
+        throw  new NotUpdatedException("Course: "+id+"is null and didn't update");
     }
 
     public String deleteCourse(Long id) {
@@ -96,35 +74,38 @@ public class CourseServiceImpl implements CourseService {
             courseRepository.deleteById(id);
             return "Course deleted";
         }
-        throw new UserNotDeletedException(id);
+        throw new NotDeletedException("Course: "+id+" not found to be deleted");
     }
 
     public CourseDTO enrollUser(Long userId, Long courseId) {
-        if (courseRepository.existsById(courseId) && studentRepository.existsById(userId)) {
-            Student student = studentRepository.findById(userId)
-                    .orElseThrow(() -> new UserNotFoundException(userId));
-            Course course = courseRepository.findById(courseId)
-                    .orElseThrow(() -> new UserNotFoundException(courseId));
+        Student student = studentRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("Student: "+userId+" not found"));
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new NotFoundException("Course: "+courseId+" not found"));
 
+        if(course.getStudentsEnrolled() != null){
             course.getStudentsEnrolled().add(student);
-            student.setCourse(course);
-
-            studentRepository.save(student);
-            courseRepository.save(course);
-
-            return convertCourseToDTO(
-                    courseRepository.findById(courseId)
-                            .orElseThrow(() -> new UserNotFoundException(courseId))
-            );
+        }else {
+            course.setStudentsEnrolled(new HashSet<>());
+            course.getStudentsEnrolled().add(student);
         }
-        throw new UserNotFoundException(userId);
+
+        student.setCourse(course);
+
+        studentRepository.save(student);
+        courseRepository.save(course);
+
+        return convertCourseToDTO(
+                courseRepository.findById(courseId)
+                        .orElseThrow(() -> new NotFoundException("Course: "+courseId+" not found"))
+        );
     }
 
     public SubjectDTO assignSubject(Long courseId, Long subjectId) {
         Course course = courseRepository.findById(courseId).orElseThrow(
-                () -> new UserNotFoundException(courseId));
+                () -> new NotFoundException("Course: "+courseId+" not found"));
         Subject subject = subjectRepository.findById(subjectId).orElseThrow(
-                () -> new UserNotFoundException(subjectId));
+                () -> new NotFoundException("Subject: "+subjectId+" not found"));
 
         subject.setCourse(course);
 
@@ -138,7 +119,7 @@ public class CourseServiceImpl implements CourseService {
         courseRepository.save(course);
         subjectRepository.save(subject);
 
-        return subjectService.convertSubjectToDTO(subject);
+        return MapperToDto.convertSubjectToDTO(subject);
 
     }
 }
