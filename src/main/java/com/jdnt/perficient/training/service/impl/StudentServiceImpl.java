@@ -88,7 +88,7 @@ public class StudentServiceImpl implements StudentService {
             long repeated = userRepository.findAll().stream()
                     .filter(user -> user.getEmail().equals(newUser.getEmail())).count();
 
-            if(repeated==0){
+            if(repeated==0L){
                 return convertStudentToDTO(
                         studentRepository.save(newUser)
                 );

@@ -4,6 +4,7 @@ import com.jdnt.perficient.training.dto.CourseDTO;
 import com.jdnt.perficient.training.dto.StudentDTO;
 import com.jdnt.perficient.training.entity.Course;
 import com.jdnt.perficient.training.entity.Student;
+import com.jdnt.perficient.training.entity.User;
 import com.jdnt.perficient.training.exception.NotCreatedException;
 import com.jdnt.perficient.training.exception.NotDeletedException;
 import com.jdnt.perficient.training.exception.NotFoundException;
@@ -137,6 +138,18 @@ class StudentServiceImplTest {
         expectedStudent.setUsername("JuanNaranjo");
 
         assertEquals(convertStudent, expectedStudent);
+    }
+
+    @Test
+    void createStudentRepeatedEmailTest() {
+        List<User> userList = new ArrayList<>();
+        userList.add(student);
+
+        when(userRepository.findAll()).thenReturn(userList);
+
+        assertThrows(NotCreatedException.class,
+                () -> studentService.createStudent(student)
+        );
     }
 
     @Test
