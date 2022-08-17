@@ -59,7 +59,7 @@ public class CourseServiceImpl implements CourseService {
     public CourseDTO updateCourse(Long id, Course newCourse) {
         if (newCourse != null) {
             Course course = courseRepository.findById(id)
-                    .orElseThrow(() -> new NotUpdatedException("Course: "+id+"is null and didn't update"));
+                    .orElseThrow(() -> new NotUpdatedException("Course: "+id+"was not found"));
 
             course.setName(newCourse.getName());
             courseRepository.save(course);
