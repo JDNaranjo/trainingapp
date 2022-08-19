@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.jdnt.perficient.training.utility.MapperToDto.convertSubjectToDTO;
 
@@ -23,32 +22,33 @@ public class SubjectServiceImpl implements SubjectService {
     @Autowired
     SubjectRepository subjectRepository;
 
-    public List<SubjectDTO> getSubjects(){
+    public List<SubjectDTO> getSubjects() {
         return subjectRepository.findAll().stream()
                 .map(MapperToDto::convertSubjectToDTO)
-                .collect(Collectors.toList());
+                .toList();
     }
 
-    public SubjectDTO getSubjectById(Long id){
+    public SubjectDTO getSubjectById(Long id) {
         return convertSubjectToDTO(
-                subjectRepository.findById(id).orElseThrow(() -> new NotFoundException("Subject: "+id+" not found"))
+                subjectRepository.findById(id).orElseThrow(
+                        () -> new NotFoundException("Subject: " + id + " not found")
+                )
         );
     }
 
-    public SubjectDTO createSubject(Subject newSubject){
-        if (newSubject != null){
+    public SubjectDTO createSubject(Subject newSubject) {
+        if (newSubject != null) {
             return convertSubjectToDTO(
                     subjectRepository.save(newSubject)
             );
-        }else {
-            throw new NotCreatedException("Subject can not be null");
         }
+        throw new NotCreatedException("Subject can not be null");
     }
 
     public SubjectDTO updateSubject(Long id, Subject newSubject) {
-        if (newSubject != null){
+        if (newSubject != null) {
             Subject subject = subjectRepository.findById(id).orElseThrow(
-                    () -> new NotFoundException("Subject: "+id+" cant be found"));
+                    () -> new NotFoundException("Subject: " + id + " cant be found"));
 
             subject.setName(newSubject.getName());
             subject.setDescription(newSubject.getDescription());
@@ -56,17 +56,17 @@ public class SubjectServiceImpl implements SubjectService {
 
             return convertSubjectToDTO(
                     subjectRepository.save(subject)
-                );
+            );
         }
-            throw new NotUpdatedException("Course: "+id+"is null and didn't update");
+        throw new NotUpdatedException("Course: " + id + "is null and didn't update");
     }
 
     public String deleteCourse(Long id) {
-        if(subjectRepository.existsById(id)){
+        if (subjectRepository.existsById(id)) {
             subjectRepository.deleteById(id);
             return "Subject deleted";
         }
-        throw new NotDeletedException("Course: "+id+" not found to be deleted");
+        throw new NotDeletedException("Course: " + id + " not found to be deleted");
     }
 
 }

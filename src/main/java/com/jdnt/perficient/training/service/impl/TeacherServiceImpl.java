@@ -10,7 +10,7 @@ import com.jdnt.perficient.training.exception.NotFoundException;
 import com.jdnt.perficient.training.exception.NotUpdatedException;
 import com.jdnt.perficient.training.repository.SubjectRepository;
 import com.jdnt.perficient.training.repository.TeacherRepository;
-import com.jdnt.perficient.training.service.SubjectService;
+import com.jdnt.perficient.training.repository.UserRepository;
 import com.jdnt.perficient.training.service.TeacherService;
 import com.jdnt.perficient.training.utility.MapperToDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.jdnt.perficient.training.utility.MapperToDto.convertTeacherToDTO;
 
@@ -29,25 +28,24 @@ public class TeacherServiceImpl implements TeacherService {
     TeacherRepository teacherRepository;
     @Autowired
     SubjectRepository subjectRepository;
-
+    @Autowired
+    UserRepository userRepository;
 
     public SubjectDTO updateSubject(Long teacherId, Long subjectId) {
         Teacher teacher = teacherRepository.findById(teacherId).orElseThrow(
-                () -> new NotFoundException("Teacher: "+teacherId+" was not found")
+                () -> new NotFoundException("Teacher: " + teacherId + " was not found")
         );
         Subject subject = subjectRepository.findById(subjectId).orElseThrow(
-                () -> new NotFoundException("Subject: "+ subjectId+" was not found")
+                () -> new NotFoundException("Subject: " + subjectId + " was not found")
         );
-
         subject.setTeacher(teacher);
 
-        if(teacher.getSubjects()!= null){
+        if (teacher.getSubjects() != null) {
             teacher.getSubjects().add(subject);
-        }else {
+        } else {
             teacher.setSubjects(new ArrayList<>());
             teacher.getSubjects().add(subject);
         }
-
         teacherRepository.save(teacher);
         subjectRepository.save(subject);
 
@@ -56,7 +54,7 @@ public class TeacherServiceImpl implements TeacherService {
 
     public List<SubjectDTO> getSubjects(Long id) {
         return teacherRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Teacher: "+id+" not found"))
+                .orElseThrow(() -> new NotFoundException("Teacher: " + id + " not found"))
                 .getSubjects()
                 .stream().map(MapperToDto::convertSubjectToDTO)
                 .toList();
@@ -64,12 +62,15 @@ public class TeacherServiceImpl implements TeacherService {
 
     public String deleteSubject(Long teacherId, Long subjectId) {
         Teacher teacher = teacherRepository.findById(teacherId)
-                .orElseThrow(() -> new NotFoundException("Teacher: "+teacherId+" not found"));
-
-        teacher.getSubjects().remove(
-                subjectRepository.findById(subjectId).orElseThrow(
-                        () -> new NotFoundException("Subject: "+subjectId+" not found")
-                ));
+                .orElseThrow(() -> new NotFoundException("Teacher: " + teacherId + " not found"));
+        Subject subject = subjectRepository.findById(subjectId).orElseThrow(
+                () -> new NotFoundException("Subject: " + subjectId + " not found")
+        );
+        try {
+            teacher.getSubjects().remove(subject);
+        } catch (Exception e) {
+            throw new NotDeletedException("Subject not associate to teacher");
+        }
         return "Subject deleted";
     }
 
@@ -82,44 +83,47 @@ public class TeacherServiceImpl implements TeacherService {
     public TeacherDTO getTeacherById(Long id) {
         return convertTeacherToDTO(
                 teacherRepository.findById(id)
-                        .orElseThrow(() -> new NotFoundException("Teacher: "+id+" not found"))
+                        .orElseThrow(() -> new NotFoundException("Teacher: " + id + " not found"))
         );
     }
 
     public TeacherDTO createTeacher(Teacher newUser) {
-        if(newUser!=null){
-            return convertTeacherToDTO(
-                    teacherRepository.save(newUser)
-            );
+        if (newUser != null) {
+            long repeated = userRepository.findAll().stream()
+                    .filter(user -> user.getEmail().equals(newUser.getEmail())).count();
+            if (repeated == 0L) {
+                return convertTeacherToDTO(
+                        teacherRepository.save(newUser)
+                );
+            }
+            throw new NotCreatedException("email already taken");
         }
         throw new NotCreatedException("Teacher can not be null");
     }
 
     public TeacherDTO updateTeacher(Long id, Teacher newUser) {
-        if (newUser != null){
+        if (newUser != null) {
             Teacher user = teacherRepository.findById(id).orElseThrow(
-                    () -> new NotFoundException("Teacher: "+id+" was not found")
+                    () -> new NotFoundException("Teacher: " + id + " was not found")
             );
-
             user.setEmail(newUser.getEmail());
             user.setLastName(newUser.getLastName());
             user.setName(newUser.getName());
             user.setPassword(newUser.getPassword());
             user.setUsername(newUser.getUsername());
             user.setSubjects(newUser.getSubjects());
-
             return convertTeacherToDTO(
                     teacherRepository.save(user)
             );
         }
-        throw new NotUpdatedException("Teacher: "+id+" is null and didn't update");
+        throw new NotUpdatedException("Teacher: " + id + " is null and didn't update");
     }
 
     public String deleteTeacher(Long id) {
-        if(teacherRepository.existsById(id)){
+        if (teacherRepository.existsById(id)) {
             teacherRepository.deleteById(id);
             return "User deleted";
         }
-        throw new NotDeletedException("Teacher: "+id+" not found to be deleted");
+        throw new NotDeletedException("Teacher: " + id + " not found to be deleted");
     }
 }

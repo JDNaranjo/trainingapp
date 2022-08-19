@@ -171,8 +171,10 @@ class StudentServiceImplTest {
 
     @Test
     void updateStudentTest() {
-        when(studentRepository.findById(anyLong())).thenReturn(Optional.of(student));
-        when(studentRepository.save(any(Student.class))).thenReturn(student2);
+        when(studentRepository.findById(anyLong()))
+                .thenReturn(Optional.of(student));
+        when(studentRepository.save(any(Student.class)))
+                .thenReturn(student2);
 
         StudentDTO convertStudent = studentService.updateStudent(123L, student2);
 
