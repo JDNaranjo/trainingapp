@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping(path ="api/course")
@@ -20,8 +21,8 @@ public class CourseController {
     private CourseServiceImpl courseService;
 
     @GetMapping
-    public List<CourseDTO> getCourses(){
-        return courseService.getCourses();
+    public ResponseEntity<List<CourseDTO>> getCourses(){
+        return new ResponseEntity<>(courseService.getCourses(), HttpStatus.OK);
     }
 
     @GetMapping(value = "/{id}")
@@ -40,7 +41,7 @@ public class CourseController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteCourse(@PathVariable Long id){
+    public ResponseEntity<Map<String, String>> deleteCourse(@PathVariable Long id){
         return new ResponseEntity<>(courseService.deleteCourse(id), HttpStatus.OK);
     }
 

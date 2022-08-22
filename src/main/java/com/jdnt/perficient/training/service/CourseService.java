@@ -5,6 +5,7 @@ import com.jdnt.perficient.training.dto.SubjectDTO;
 import com.jdnt.perficient.training.entity.Course;
 
 import java.util.List;
+import java.util.Map;
 
 public interface CourseService {
 
@@ -12,7 +13,7 @@ public interface CourseService {
     CourseDTO getCourseById(Long id);
     CourseDTO createCourse(Course newCourse);
     CourseDTO updateCourse(Long id, Course newCourse);
-    String deleteCourse(Long id);
+    Map<String, String> deleteCourse(Long id);
     CourseDTO enrollUser(Long userId, Long courseId);
     SubjectDTO assignSubject(Long courseId, Long subjectId);
 }

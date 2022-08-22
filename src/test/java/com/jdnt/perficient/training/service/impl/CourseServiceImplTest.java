@@ -21,10 +21,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -179,7 +176,10 @@ class CourseServiceImplTest {
         when(courseRepository.existsById(anyLong())).thenReturn(true);
         doNothing().when(courseRepository).deleteById(anyLong());
 
-        assertEquals("Course deleted", courseService.deleteCourse(123L));
+        Map<String, String> body = new HashMap<>();
+        body.put("result", "Course deleted");
+
+        assertEquals(body, courseService.deleteCourse(123L));
     }
 
     @Test

@@ -17,8 +17,10 @@ import com.jdnt.perficient.training.utility.MapperToDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 import static com.jdnt.perficient.training.utility.MapperToDto.convertCourseToDTO;
 
@@ -69,10 +71,13 @@ public class CourseServiceImpl implements CourseService {
         throw  new NotUpdatedException("Course: "+id+"is null and didn't update");
     }
 
-    public String deleteCourse(Long id) {
+    public Map<String, String> deleteCourse(Long id) {
+        Map<String, String> body = new HashMap<>();
+
         if (courseRepository.existsById(id)) {
             courseRepository.deleteById(id);
-            return "Course deleted";
+            body.put("result", "Course deleted");
+            return body;
         }
         throw new NotDeletedException("Course: "+id+" not found to be deleted");
     }

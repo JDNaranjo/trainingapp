@@ -20,8 +20,8 @@ public class StudentController {
     private StudentService studentService;
 
     @GetMapping
-    public List<StudentDTO> getUsers(){
-        return studentService.getStudents();
+    public ResponseEntity<List<StudentDTO>> getUsers(){
+        return new ResponseEntity<>(studentService.getStudents(), HttpStatus.OK);
     }
 
     @GetMapping(value = "/{id}")
